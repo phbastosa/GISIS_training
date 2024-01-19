@@ -22,7 +22,7 @@ class Wavefield_1D():
         # self.interfaces = [z1, z2, z3, ..., zn]
         # self.velocities = [v1, v2, v3, ..., vn]
 
-    def set_layer_cake_model(self):
+    def set_model(self):
         pass    
 
     def plot_model(self):
