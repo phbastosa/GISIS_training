@@ -13,7 +13,7 @@ def main_simulation():
     myWave[id].set_wavelet()
     myWave[id].plot_wavelet()
 
-    # myWave[id].set_layer_cake_model()
+    # myWave[id].set_model()
     # myWave[id].plot_model()
 
 if __name__ == "__main__":
