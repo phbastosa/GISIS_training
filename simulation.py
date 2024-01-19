@@ -1,6 +1,6 @@
 from modeling import scalar
 
-def simulation():
+def main_simulation():
 
     id = 0
 
@@ -8,14 +8,16 @@ def simulation():
               scalar.Wavefield_2D(),
               scalar.Wavefield_3D()] 
 
-    # print(myWave[id]._type)
     myWave[id].get_type()
+    print(myWave[id].type)
+    print(scalar.Wavefield_1D.type)
 
     myWave[id].set_wavelet()
     myWave[id].plot_wavelet()
 
 
+
 if __name__ == "__main__":
-    simulation()
+    main_simulation()
 
 

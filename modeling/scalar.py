@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Wavefield_1D():
-    
+
+    type = "1D wave propagation in constant density acoustic isotropic media"
+
     def __init__(self):
         
-        self._type = "1D wave propagation in constant density acoustic isotropic media"
-
         # TODO: read parameters from a file
 
         self.nt = 1001
@@ -14,7 +14,7 @@ class Wavefield_1D():
         self.fmax = 30.0
 
     def get_type(self):
-        print(self._type)
+        print(self.type)
 
     def set_wavelet(self):
     
@@ -45,15 +45,17 @@ class Wavefield_1D():
 
 class Wavefield_2D(Wavefield_1D):
     
-    def __init__(self):
-        super().__init__()
-        
-        self._type = "2D wave propagation in constant density acoustic isotropic media"    
-
-
-class Wavefield_3D(Wavefield_2D):
+    type = "2D wave propagation in constant density acoustic isotropic media"    
     
     def __init__(self):
         super().__init__()
         
-        self._type = "3D wave propagation in constant density acoustic isotropic media"    
+
+
+class Wavefield_3D(Wavefield_2D):
+
+    type = "3D wave propagation in constant density acoustic isotropic media"    
+
+    def __init__(self):
+        super().__init__()
+        
