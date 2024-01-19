@@ -13,8 +13,8 @@ def main_simulation():
     myWave[id].set_wavelet()
     myWave[id].plot_wavelet()
 
-    # myWave[id].set_model()
-    # myWave[id].plot_model()
+    myWave[id].set_model()
+    myWave[id].plot_model()
 
 if __name__ == "__main__":
     main_simulation()
