@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 class Wavefield_1D():
 
-    type = "1D wave propagation in constant density acoustic isotropic media"
+    wave_type = "1D wave propagation in constant density acoustic isotropic media"
 
     def __init__(self):
         
@@ -13,8 +13,24 @@ class Wavefield_1D():
         self.dt = 1e-3
         self.fmax = 30.0
 
+        # self.nz
+        # self.dz
+
+        # self.model = np.zeros(nz)
+        # self.depth = np.arange(nz) * self.dz
+
+        # self.interfaces = [z1, z2, z3, ..., zn]
+        # self.velocities = [v1, v2, v3, ..., vn]
+
+    def set_layer_cake_model(self):
+        pass    
+
+    def plot_model(self):
+        pass
+
+
     def get_type(self):
-        print(self.type)
+        print(self.wave_type)
 
     def set_wavelet(self):
     
@@ -45,16 +61,15 @@ class Wavefield_1D():
 
 class Wavefield_2D(Wavefield_1D):
     
-    type = "2D wave propagation in constant density acoustic isotropic media"    
+    wave_type = "2D wave propagation in constant density acoustic isotropic media"    
     
     def __init__(self):
         super().__init__()
         
 
-
 class Wavefield_3D(Wavefield_2D):
 
-    type = "3D wave propagation in constant density acoustic isotropic media"    
+    wave_type = "3D wave propagation in constant density acoustic isotropic media"    
 
     def __init__(self):
         super().__init__()

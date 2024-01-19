@@ -9,13 +9,12 @@ def main_simulation():
               scalar.Wavefield_3D()] 
 
     myWave[id].get_type()
-    print(myWave[id].type)
-    print(scalar.Wavefield_1D.type)
 
     myWave[id].set_wavelet()
     myWave[id].plot_wavelet()
 
-
+    # myWave[id].set_layer_cake_model()
+    # myWave[id].plot_model()
 
 if __name__ == "__main__":
     main_simulation()
