@@ -33,6 +33,16 @@ class Wavefield_1D():
         for layerId, interface in enumerate(self.interfaces):
             self.model[int(interface/self.dz):] = self.velocities[layerId+1]    
 
+    def set_wavelet(self):
+    
+        t0 = 2.0*np.pi/self.fmax
+        fc = self.fmax/(3.0*np.sqrt(np.pi))
+        td = np.arange(self.nt)*self.dt - t0
+
+        arg = np.pi*(np.pi*fc*td)**2.0
+
+        self.wavelet = (1.0 - 2.0*arg)*np.exp(-arg)
+
     def plot_model(self):
         
         fig, ax = plt.subplots(num = "Model plot", figsize = (4, 8), clear = True)
@@ -47,16 +57,6 @@ class Wavefield_1D():
         ax.invert_yaxis()
         fig.tight_layout()
         plt.show()
-
-    def set_wavelet(self):
-    
-        t0 = 2.0*np.pi/self.fmax
-        fc = self.fmax/(3.0*np.sqrt(np.pi))
-        td = np.arange(self.nt)*self.dt - t0
-
-        arg = np.pi*(np.pi*fc*td)**2.0
-
-        self.wavelet = (1.0 - 2.0*arg)*np.exp(-arg)
 
     def plot_wavelet(self):
        
