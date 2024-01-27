@@ -24,6 +24,9 @@ class Wavefield_1D():
 
         self.model = self.velocities[0] * np.ones(self.nz)
 
+        self.z_src = np.array([100, 200, 300])
+        self.z_rec = np.array([2500, 3500, 4500])
+
     def get_type(self):
         
         print(self.wave_type)
@@ -47,12 +50,20 @@ class Wavefield_1D():
         
         fig, ax = plt.subplots(num = "Model plot", figsize = (4, 8), clear = True)
 
+        src_projection = np.array(self.z_src / self.dz, dtype = int)
+        rec_projection = np.array(self.z_rec / self.dz, dtype = int)
+
         ax.plot(self.model, self.depth)
+        ax.plot(self.model[src_projection], self.z_src, "*", color = "black", label = "Sources")
+        ax.plot(self.model[rec_projection], self.z_rec, "v", color = "green", label = "Receivers")
+        
         ax.set_title("Model", fontsize = 18)
         ax.set_xlabel("Velocity [m/s]", fontsize = 15)
         ax.set_ylabel("Depth [m]", fontsize = 15) 
         
         ax.set_ylim([0, (self.nz-1)*self.dz])
+
+        ax.legend(loc = "upper right", fontsize = 12)
         
         ax.invert_yaxis()
         fig.tight_layout()
