@@ -63,7 +63,6 @@ class Wavefield_1D():
 
             self.P[:,n+1] = (self.dt*self.model)**2 * laplacian + 2.0*self.P[:,n] - self.P[:,n-1] 
 
-
     def plot_wavefield(self):
         fig, ax = plt.subplots(num = "Wavefield plot", figsize = (8, 8), clear = True)
 
@@ -78,7 +77,6 @@ class Wavefield_1D():
         fig.tight_layout()
         plt.show()
         
-
     def plot_model(self):
         
         fig, ax = plt.subplots(num = "Model plot", figsize = (4, 8), clear = True)
