@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from numba import njit, prange  
+
 class Wavefield_1D():
 
     wave_type = "1D wave propagation in constant density acoustic isotropic media"
@@ -9,7 +11,7 @@ class Wavefield_1D():
         
         # TODO: read parameters from a file
 
-        self.nt = 1001
+        self.nt = 10001
         self.dt = 1e-3
         self.fmax = 30.0
 
@@ -33,6 +35,7 @@ class Wavefield_1D():
 
     def set_model(self):
         
+        self.get_type()
         for layerId, interface in enumerate(self.interfaces):
             self.model[int(interface/self.dz):] = self.velocities[layerId+1]    
 
@@ -45,6 +48,36 @@ class Wavefield_1D():
         arg = np.pi*(np.pi*fc*td)**2.0
 
         self.wavelet = (1.0 - 2.0*arg)*np.exp(-arg)
+
+    def wave_propagation(self):
+
+        self.P = np.zeros((self.nz, self.nt)) # P_{i,n}
+
+        sId = int(self.z_src[0] / self.dz)
+
+        for n in range(1,self.nt-1):
+
+            self.P[sId,n] += self.wavelet[n]    
+
+            laplacian = get_laplacian_1D(self.P, self.dz, self.nz, n)
+
+            self.P[:,n+1] = (self.dt*self.model)**2 * laplacian + 2.0*self.P[:,n] - self.P[:,n-1] 
+
+
+    def plot_wavefield(self):
+        fig, ax = plt.subplots(num = "Wavefield plot", figsize = (8, 8), clear = True)
+
+        ax.imshow(self.P, aspect = "auto", cmap = "Greys")
+
+        # ax.plot(self.P[:,5000])
+
+        ax.set_title("Wavefield", fontsize = 18)
+        ax.set_xlabel("Time [s]", fontsize = 15)
+        ax.set_ylabel("Depth [m]", fontsize = 15) 
+        
+        fig.tight_layout()
+        plt.show()
+        
 
     def plot_model(self):
         
@@ -83,6 +116,16 @@ class Wavefield_1D():
         fig.tight_layout()
         plt.show()
 
+
+@njit 
+def get_laplacian_1D(P, dz, nz, time_id):
+
+    d2P_dz2 = np.zeros(nz)
+
+    for i in prange(1, nz-1): 
+        d2P_dz2[i] = (P[i-1,time_id] - 2.0*P[i,time_id] + P[i+1,time_id]) / dz**2.0    
+
+    return d2P_dz2
 
 class Wavefield_2D(Wavefield_1D):
     
