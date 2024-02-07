@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as movie
 
-from PIL import Image
 from numba import njit, prange  
 
 class Wavefield_1D():
