@@ -13,15 +13,17 @@ def main_simulation():
     myWave[id].set_model()
     myWave[id].set_wavelet()    
 
-    start = time()
+    beg = time()
     myWave[id].wave_propagation()
     end = time()
 
-    print(end - start)
+    print(f"\nModeling Run Time = {end - beg:.3f} seconds")
 
     myWave[id].plot_model()
     myWave[id].plot_wavelet()
     myWave[id].plot_wavefield()
+    myWave[id].plot_seismogram()
+    myWave[id].plot_wave_propagation()
 
 
 if __name__ == "__main__":
