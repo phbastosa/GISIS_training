@@ -14,7 +14,7 @@ def main_simulation():
     myWave[id].set_wavelet()    
 
     beg = time()
-    myWave[id].wave_propagation()
+    myWave[id].fdm_propagation()
     end = time()
 
     print(f"\nModeling Run Time = {end - beg:.3f} seconds")

@@ -49,7 +49,7 @@ class Wavefield_1D():
 
         self.wavelet = (1.0 - 2.0*arg)*np.exp(-arg)
 
-    def wave_propagation(self):
+    def fdm_propagation(self):
 
         self.P = np.zeros((self.nz, self.nt))
 
