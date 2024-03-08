@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from conversions import Conversion
 
@@ -23,11 +22,5 @@ converter = Conversion()
 
 marmousi_time_section = converter.model_to_time_section(marmousi_model, model_spacing, total_time, time_spacing, max_frequency)
 marmousi_depth_section = converter.model_to_depth_section(marmousi_model, model_spacing, total_time, time_spacing, max_frequency)
-
-
-
-
-# salt_dome_time_section = m2ts.Model_to_time_section(salt_dome_model, model_spacing, total_time, time_spacing, max_frequency)
-# overthrust_time_section = m2ts.Model_to_time_section(overthurst_model, model_spacing, total_time, time_spacing, max_frequency)
 
 

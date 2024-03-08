@@ -97,9 +97,9 @@ class Conversion():
 
         return self.__depth_section
 
-    def time_to_depth():
+    def time_section_to_depth_section():
         pass
 
-    def depth_to_time():
+    def depth_section_to_time_section():
         pass
 
