@@ -51,27 +51,16 @@ for n in range(1,501):
 
 title = "Second example"
 
-# signal = np.zeros(domain)
-
-# for n in range(1,501):
-
-#     coeff = 2.0*np.sin(n*t)/n
-
-#     signal += -coeff*((-1)**n + np.sin(n*np.pi)/np.pi)
 
 
 title = "Third example"
 
-# signal = 2.0*np.pi**2.0 / 3.0 + np.zeros(domain)
-
-# for n in range(1,501):
-#     signal += 4.0*(-1)**(n+1)/n**2 * np.cos(n*t)
 
 
 fig, ax = plt.subplots(num = title, figsize = (15,5))
 
 ax.plot(t, signal - np.pi, label = "Fourier series")
-ax.plot(t, np.exp(-t), "--", label = "Real function")
+ax.plot(t, np.exp(-t) - np.pi, "--", label = "Real function")
 
 ax.set_xticks(xloc)
 ax.set_xticklabels(xlab)
