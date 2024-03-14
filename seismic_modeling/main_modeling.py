@@ -1,18 +1,15 @@
-from modules.wave_solvers_2D import Scalar
+from modules.wave_solvers_2D import BaseModeling, Scalar, Acoustic, Elastic
 
 def main():
 
-    myWave2D = Scalar()
+    myWave2D = [Scalar(), Acoustic(), Elastic()]
 
-    myWave2D.set_modeling_parameters()
+    mId = BaseModeling().modeling_type
 
-    # for shot_index in range(myWave2D.total_shots):
+    myWave2D[mId].set_modeling_parameters()
 
-        # initialization
-        # fdm_propagation (time loop)
-        # build_snapshots
-        # build_seismogram (pressure)
-
+    myWave2D[mId].plot_models()
+    myWave2D[mId].plot_wavelet()
 
 if __name__ == "__main__":
     main()
