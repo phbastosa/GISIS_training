@@ -11,6 +11,10 @@ def main():
     myWave2D[mId].plot_models()
     myWave2D[mId].plot_wavelet()
 
+    myWave2D[mId].propagation()
+
+
+
 if __name__ == "__main__":
     main()
 

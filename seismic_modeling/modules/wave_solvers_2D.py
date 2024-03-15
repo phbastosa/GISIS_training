@@ -241,6 +241,46 @@ class BaseModeling():
     def plot_models(self):
         raise NotImplementedError("Please Implement this method")
 
+    def propagation(self):
+        
+        for self.shot_id in range(self.src_total):
+
+            self.initialization()
+        
+            for self.time_id in range(self.nt):
+                
+                self.show_information()
+                
+                self.apply_wavelet()
+
+                self.solve_8E2T_FDM()
+
+                self.apply_boundary_condition()
+
+                self.get_snapshot()
+
+                self.get_seismogram()
+
+    def initialization(self):
+        pass
+
+    def show_information(self):
+        pass        
+
+    def apply_wavelet(self):
+        pass    
+
+    def solve_8E2T_FDM(self):
+        pass    
+
+    def apply_boundary_condition(self):
+        pass    
+
+    def get_snapshot(self):
+        pass
+
+    def get_seismogram(self):
+        pass
 
 class Scalar(BaseModeling):
 
