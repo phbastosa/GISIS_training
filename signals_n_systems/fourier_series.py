@@ -60,7 +60,7 @@ title = "Third example"
 fig, ax = plt.subplots(num = title, figsize = (15,5))
 
 ax.plot(t, signal - np.pi, label = "Fourier series")
-ax.plot(t, np.exp(-t) - np.pi, "--", label = "Real function")
+ax.plot(t, np.exp(-t), "--", label = "Real function")
 
 ax.set_xticks(xloc)
 ax.set_xticklabels(xlab)
