@@ -13,8 +13,6 @@ def main():
 
     myWave2D[mId].propagation()
 
-
-
 if __name__ == "__main__":
     main()
 

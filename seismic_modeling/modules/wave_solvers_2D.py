@@ -134,6 +134,9 @@ class BaseModeling():
 
         self.P = np.zeros((self.nzz, self.nxx))
 
+        self.seismogram = np.zeros((self.nt, self.rec_total))
+        self.snapshots = np.zeros((self.total_snapshots, self.nz, self.nx))
+
         self.set_wavefield()
 
     def set_parameters(self):
@@ -165,6 +168,8 @@ class BaseModeling():
         self.rec_total = int(self.rec_limits[2])
 
         self.reciprocity = eval(self.catch_parameter("reciprocity")[0]) 
+
+        self.total_snapshots = int(self.catch_parameter("total_snapshots")[0])
 
     def set_Cerjan_abc(self):
         ''' Absorbing Boundary Condition: 
@@ -208,38 +213,14 @@ class BaseModeling():
         self.z_src_grid = self.z_src // self.dz
         self.z_rec_grid = self.z_rec // self.dz            
         
-    def plot_wavelet(self):
-
-        ft_wavelet = np.fft.fft(self.wavelet)
-        freqs = np.fft.fftfreq(self.nt, self.dt)    
-        mask = freqs >= 0
-
-        fig, ax = plt.subplots(num = "Wavelet", nrows = 2, ncols = 1, figsize = (10, 4))
-
-        ax[0].plot(np.arange(self.nt)*self.dt, self.wavelet)
-        ax[0].set_xlim([0, self.nt*self.dt])
-        ax[0].set_xlabel("Time [s]", fontsize = 15)
-        ax[0].set_ylabel("Amplitude", fontsize = 15)
-
-        ax[1].stem(freqs[mask], np.abs(ft_wavelet[mask]), markerfmt = "k", linefmt = "k--", basefmt = "k")
-        ax[1].set_xlim([0, self.fmax])
-        ax[1].set_xlabel("Frequency [Hz]", fontsize = 15)
-        ax[1].set_ylabel("Amplitude", fontsize = 15)
-
-        fig.tight_layout()
-        plt.show()
-    
     def set_wavelet(self):
-        raise NotImplementedError("Please Implement this method")
+        raise NotImplementedError("Please implement this method")
 
     def set_models(self):
-        raise NotImplementedError("Please Implement this method")
+        raise NotImplementedError("Please implement this method")
 
     def set_wavefield(self):
-        raise NotImplementedError("Please Implement this method")
-
-    def plot_models(self):
-        raise NotImplementedError("Please Implement this method")
+        raise NotImplementedError("Please implement this method")
 
     def propagation(self):
         
@@ -280,6 +261,36 @@ class BaseModeling():
         pass
 
     def get_seismogram(self):
+        pass
+
+    def plot_models(self):
+        raise NotImplementedError("Please implement this method")
+
+    def plot_wavelet(self):
+
+        ft_wavelet = np.fft.fft(self.wavelet)
+        freqs = np.fft.fftfreq(self.nt, self.dt)    
+        mask = freqs >= 0
+
+        fig, ax = plt.subplots(num = "Wavelet", nrows = 2, ncols = 1, figsize = (10, 4))
+
+        ax[0].plot(np.arange(self.nt)*self.dt, self.wavelet)
+        ax[0].set_xlim([0, self.nt*self.dt])
+        ax[0].set_xlabel("Time [s]", fontsize = 15)
+        ax[0].set_ylabel("Amplitude", fontsize = 15)
+
+        ax[1].stem(freqs[mask], np.abs(ft_wavelet[mask]), markerfmt = "k", linefmt = "k--", basefmt = "k")
+        ax[1].set_xlim([0, self.fmax])
+        ax[1].set_xlabel("Frequency [Hz]", fontsize = 15)
+        ax[1].set_ylabel("Amplitude", fontsize = 15)
+
+        fig.tight_layout()
+        plt.show()
+
+    def plot_snapshots(self):
+        pass
+
+    def plot_seismogram(self):
         pass
 
 class Scalar(BaseModeling):
