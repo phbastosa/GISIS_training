@@ -211,7 +211,7 @@ class BaseModeling():
         self.x_rec_grid = np.array(self.x_rec / self.dx, dtype = int)
 
         self.z_src_grid = int(self.z_src / self.dz)
-        self.z_rec_grid = int(self.z_rec / self.dz)            
+        self.z_rec_grid = int(self.z_rec / self.dz)           
         
     def set_wavelet(self):
         raise NotImplementedError("Please implement this method")
@@ -250,7 +250,8 @@ class BaseModeling():
 
         print(f"\nRun time: {run_time:.3f} seconds")
 
-        self.snapshots.flatten("F").astype(np.float32, order = "F").tofile(f"snapshots_Nt{self.total_snapshots}_Nz{self.nz}_Nx{self.nx}_dx{self.dx:.0f}m_dz{self.dz:.0f}m.bin")
+        self.snapshots.flatten("F").astype(np.float32, order = "F").tofile(f"snapshots_{self.name}_Nt{self.total_snapshots}_Nz{self.nz}_Nx{self.nx}_dx{self.dx:.0f}m_dz{self.dz:.0f}m.bin")
+        self.seismogram.flatten("F").astype(np.float32, order = "F").tofile(f"seismogram_{self.name}_Nt{self.nt}_Nx{self.rec_total}_Dt{self.dt*1e6:.0f}us.bin")
 
     def initialization(self):
         
@@ -263,6 +264,10 @@ class BaseModeling():
 
         self.sIdx = self.x_src_grid[self.shot_id] + self.nabc
         self.sIdz = self.z_src_grid + self.nabc
+        
+        # need adaptation for streammer simulation
+        self.rIdx = self.x_rec_grid + self.nabc 
+        self.rIdz = self.z_rec_grid + self.nabc
 
         self.snap_count = 0
 
@@ -293,7 +298,8 @@ class BaseModeling():
             self.snap_count += 1
 
     def get_seismogram(self):
-        pass
+        for recId in range(self.rec_total):
+            self.seismogram[self.time_id,recId] = self.P[self.rIdz,self.rIdx[recId]]
 
     def plot_models(self):
         raise NotImplementedError("Please implement this method")

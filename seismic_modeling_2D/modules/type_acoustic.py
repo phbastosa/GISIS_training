@@ -16,19 +16,22 @@ class Acoustic(BaseModeling):
         self.vp_filename = self.catch_parameter("vp_filename")[0]  
         self.rho_filename = self.catch_parameter("rho_filename")[0]  
         
-        self.vp, self.Vp = self.set_generical_model(self.vp_filename)    
-        self.rho, self.Rho = self.set_generical_model(self.rho_filename)    
+        # self.vp, self.Vp = self.set_generical_model(self.vp_filename)    
+        # self.rho, self.Rho = self.set_generical_model(self.rho_filename)    
 
-        self.rho *= 1000.0
-        self.Rho *= 1000.0
+        self.vp = 1500.0*np.ones((self.nz, self.nx))
+        self.Vp = 1500.0*np.ones((self.nzz, self.nxx))
+
+        self.rho = 1000.0*np.ones((self.nz, self.nx))
+        self.Rho = 1000.0*np.ones((self.nzz, self.nxx))
 
         self.Bx = 1.0 / self.Rho
         self.Bz = 1.0 / self.Rho
 
         self.K = self.Rho*self.Vp**2.0
         
-        self.Bx[1:-1,:] = 0.5*(1.0/self.Rho[1:,:] + 1.0/self.Rho[:-1,:])
-        self.Bz[:,1:-1] = 0.5*(1.0/self.Rho[:,1:] + 1.0/self.Rho[:,:-1])
+        self.Bx[:-1,:] = 0.5*(1.0/self.Rho[1:,:] + 1.0/self.Rho[:-1,:])
+        self.Bz[:,:-1] = 0.5*(1.0/self.Rho[:,1:] + 1.0/self.Rho[:,:-1])
 
     def set_wavelet(self):
 
