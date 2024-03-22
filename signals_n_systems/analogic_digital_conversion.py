@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 sine_amplitudes = [6, 10, 2] 
-sine_frequencies = [5, 6, 7]     # [Hz]
+sine_frequencies = [5, 10, 15]     # [Hz]
 
 total_time = 1.0                    # [s]
 f_s = 50                            # sampling frequency [Hz]

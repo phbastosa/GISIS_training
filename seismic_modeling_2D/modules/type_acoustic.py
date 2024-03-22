@@ -50,9 +50,9 @@ class Acoustic(BaseModeling):
     def plot_models(self):
 
         imgs = [self.vp, self.rho]
-        legends = ["P wave velocity [m/s]", "Density [kg/m³]"]
         pmin = [np.min(self.vp), np.min(self.rho)]
         pmax = [np.max(self.vp), np.max(self.rho)]
+        legends = ["P wave velocity [m/s]", "Density [kg/m³]"]
 
         self.set_generical_model_plot(imgs, legends, pmin, pmax)
 

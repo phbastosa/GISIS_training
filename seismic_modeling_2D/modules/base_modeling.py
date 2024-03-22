@@ -62,7 +62,7 @@ class BaseModeling():
         wavelet = (1.0 - 2.0*arg)*np.exp(-arg)
         omega = 2.0*np.pi*np.fft.fftfreq(self.nt, self.dt)
 
-        return np.real(np.fft.ifft(np.fft.fft(wavelet) * np.sqrt(complex(0,1)*omega)))
+        return np.real(np.fft.ifft(np.fft.fft(wavelet)*np.sqrt(complex(0,1)*omega)))
          
     def set_generical_model_plot(self, imgs, legends, pmin, pmax):
         

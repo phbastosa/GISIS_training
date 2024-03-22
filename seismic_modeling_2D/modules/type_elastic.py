@@ -44,9 +44,9 @@ class Elastic(BaseModeling):
     def plot_models(self):
 
         imgs = [self.vp, self.vs, self.rho]
-        legends = ["P wave velocity [m/s]", "S wave velocity [m/s]", "Density [kg/m³]"]
         pmin = [np.min(self.vp), np.min(self.vs), np.min(self.rho)]
         pmax = [np.max(self.vp), np.max(self.vs), np.max(self.rho)]
+        legends = ["P wave velocity [m/s]", "S wave velocity [m/s]", "Density [kg/m³]"]
 
         self.set_generical_model_plot(imgs, legends, pmin, pmax)
 

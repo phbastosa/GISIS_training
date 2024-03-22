@@ -1,0 +1,32 @@
+# --------------------------------------------------------
+# Parameter file -----------------------------------------
+#---------------------------------------------------------
+
+x_samples = 3401
+z_samples = 701
+
+x_spacing = 5
+z_spacing = 5
+
+vp_filename = models/vp_marmousi_701x3401_5m.bin
+vs_filename = models/vs_marmousi_701x3401_5m.bin
+rho_filename = models/rho_marmousi_701x3401_5m.bin
+
+modeling_type = 0
+
+t_samples = 5001
+t_spacing = 1e-3
+max_frequency = 30
+
+abc_samples = 100
+abc_factor = 0.0025
+
+x_src = 50 16950 100  
+x_rec = 1000 16000 1  
+
+src_elevation = 10
+rec_elevation = 450
+
+reciprocity = True
+
+total_snapshots = 11

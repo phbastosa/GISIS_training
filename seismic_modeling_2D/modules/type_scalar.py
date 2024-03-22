@@ -14,7 +14,7 @@ class Scalar(BaseModeling):
     def set_models(self):
         
         self.vp_filename = self.catch_parameter("vp_filename")[0]  
-        # self.vp, self.Vp = self.set_generical_model(self.vp_filename)    
+        self.vp, self.Vp = self.set_generical_model(self.vp_filename)    
 
         self.vp = 1500.0*np.ones((self.nz, self.nx))
         self.Vp = 1500.0*np.ones((self.nzz, self.nxx))
@@ -25,15 +25,15 @@ class Scalar(BaseModeling):
 
     def set_wavefield(self):
 
-        self.U_old = np.zeros_like(self.Vp)
-        self.U_fut = np.zeros_like(self.Vp)
+        self.U_old = np.zeros_like(self.P)
+        self.U_fut = np.zeros_like(self.P)
 
     def plot_models(self):
         
         imgs = [self.vp]
-        legends = ["P wave velocity [m/s]"]
         pmin = [np.min(self.vp)]
         pmax = [np.max(self.vp)]
+        legends = ["P wave velocity [m/s]"]
 
         self.set_generical_model_plot(imgs, legends, pmin, pmax)
 
