@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-sine_amplitudes = [6, 10, 2] 
-sine_frequencies = [5, 10, 15]     # [Hz]
+sine_amplitudes = [3, 10, -1] 
+sine_frequencies = [5, 15, 30]      # [Hz]
 
 total_time = 1.0                    # [s]
-f_s = 50                            # sampling frequency [Hz]
+f_s = 1 / 0.010    # 10 ms           # sampling frequency [Hz]
 
 analogic_time = np.linspace(0, total_time, int(1e6)) 
 analogic_sine = np.zeros_like(analogic_time)
