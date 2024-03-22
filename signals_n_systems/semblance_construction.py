@@ -29,31 +29,18 @@ for indt, t0 in enumerate(time):
         target = np.array(np.sqrt(t0**2 + (offset*dx/v)**2) / dt, dtype = int) 
 
         mask = target < nt
-<<<<<<< HEAD
-        
-        summation1 = np.sum(np.abs(seismic[target[mask],:]))**2
-        summation2 = np.sum(seismic[target[mask],:]**2)
-        
-        if summation2 != 0.0: 
-            semblance[t, v] = (1.0 / nx) * summation1 / summation2 
-=======
     
         t = target[mask]
         x = offset[mask]
     
         semblance[indt, indv] = np.sum(np.abs(seismic[t,x]))**2
     
->>>>>>> 2e91587144aa721f003e54475f07e638d1451d59
 
 xloc = np.linspace(0, len(vrms)-1, 9)
 xlab = np.linspace(vi, vf, 9)
 
-<<<<<<< HEAD
-scale = 10.0*np.std(semblance)
-=======
 tloc = np.linspace(0, nt, 11)
 tlab = np.around(np.linspace(0, nt-1, 11)*dt, decimals = 3)
->>>>>>> 2e91587144aa721f003e54475f07e638d1451d59
 
 scale = 15.0*np.std(semblance)
 
@@ -83,9 +70,5 @@ ax[1].set_xlabel("RMS Velocity [km/s]", fontsize = 15)
 ax[1].set_ylabel("Two Way Time [s]", fontsize = 15)
 
 fig.tight_layout()
-<<<<<<< HEAD
-plt.show()
-=======
 plt.grid()
 plt.show()
->>>>>>> 2e91587144aa721f003e54475f07e638d1451d59

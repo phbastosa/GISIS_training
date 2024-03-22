@@ -38,5 +38,6 @@ plt.axis([-r, r, -r, r])
 plt.xticks(ticks); 
 plt.yticks(ticks)
 
+plt.legend(["unit circle","zeros", "poles"])
 plt.tight_layout()
 plt.show()

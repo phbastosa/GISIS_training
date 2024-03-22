@@ -21,20 +21,19 @@ xloc = np.linspace(-np.pi, np.pi, 9)
 xlab = [r"$-\pi$", r"$\dfrac{-3\pi}{4}$", r"$\dfrac{-\pi}{2}$", r"$\dfrac{-\pi}{4}$", 
         r"$0$", r"$\dfrac{\pi}{4}$", r"$\dfrac{\pi}{2}$", r"$\dfrac{3\pi}{4}$", r"$-\pi$"]
 
-# fig, ax = plt.subplots(num = "Simple signal", figsize = (15,5))
+fig, ax = plt.subplots(num = "Simple signal", figsize = (15,5))
 
-# ax.plot(t, signal)
+ax.plot(t, signal)
 
-# ax.set_xticks(xloc)
-# ax.set_xticklabels(xlab)
-# ax.set_xlim([-np.pi, np.pi])
+ax.set_xticks(xloc)
+ax.set_xticklabels(xlab)
+ax.set_xlim([-np.pi, np.pi])
 
-# ax.set_xlabel("t [s]", fontsize = 15)
-# ax.set_ylabel("Amplitude", fontsize = 15)
+ax.set_xlabel("t [s]", fontsize = 15)
+ax.set_ylabel("Amplitude", fontsize = 15)
 
-# fig.tight_layout()
-# plt.show()
-
+fig.tight_layout()
+plt.show()
 
 title = "First example"
 
@@ -48,27 +47,10 @@ for n in range(1,5):
 
     signal += c*np.cos(n*t) + n*c*np.sin(n*t)
 
-
-# title = "Second example"
-
-signal = np.zeros(domain)
-
-for n in range(1, 50):
-    
-    signal += -2*np.sin(n*t)/n * ((-1)**n + np.sin(n*np.pi)/(n*np.pi))
-
-# title = "Third example"
-
-
-
 fig, ax = plt.subplots(num = title, figsize = (15,5))
 
-# ax.plot(t, signal - 7*np.pi/6, label = "Fourier series")
-# ax.plot(t, np.exp(-t), "--", label = "Real function")
-
-ax.plot(t, signal, label = "Fourier series")
-ax.plot(t, t, "--", label = "Real function")
-
+ax.plot(t, signal - 7*np.pi/6, label = "Fourier series")
+ax.plot(t, np.exp(-t), "--", label = "Real function")
 
 ax.set_xticks(xloc)
 ax.set_xticklabels(xlab)
@@ -83,3 +65,36 @@ ax.grid(True)
 
 fig.tight_layout()
 plt.show()
+
+
+# title = "Second example"
+
+signal = np.zeros(domain)
+
+for n in range(1, 50):
+    
+    signal += -2*np.sin(n*t)/n * ((-1)**n + np.sin(n*np.pi)/(n*np.pi))
+
+fig, ax = plt.subplots(num = title, figsize = (15,5))
+
+ax.plot(t, signal, label = "Fourier series")
+ax.plot(t, t, "--", label = "Real function")
+
+ax.set_xticks(xloc)
+ax.set_xticklabels(xlab)
+ax.set_xlim([-np.pi, np.pi])
+
+ax.set_xlabel("t [s]", fontsize = 15)
+ax.set_ylabel("Amplitude", fontsize = 15)
+
+ax.legend(loc = "upper left", fontsize = 15)
+
+ax.grid(True)
+
+fig.tight_layout()
+plt.show()
+
+# title = "Third example"
+
+
+

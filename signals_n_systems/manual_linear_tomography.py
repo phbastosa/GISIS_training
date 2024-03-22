@@ -49,7 +49,9 @@ G = np.array([[d1, d1, d1, 0, 0, 0, 0, 0, 0],
               [ 0, 0, 0, 0, 0, 0, d1, d1, d1]])
 
 # reading from a text file
-m = 1.0 / np.loadtxt("velocity_model.txt", dtype = float)
+m = 1.0 / np.array([1500, 1500, 1500, 
+                    1600, 1600, 1600, 
+                    1700, 1700, 1700])
 
 # Computing travel times
 t = np.dot(G, m)

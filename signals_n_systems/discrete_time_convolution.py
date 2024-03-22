@@ -28,12 +28,12 @@ def discreteTimeConvolution(n1,x1,n2,x2):
 
 def plot_convolution(n1,x1,n2,x2,n,y):
 
-    k = np.arange(n[0]-len(n2)+1,n[0]+1)
+    k = np.arange(n[0]-len(n2)+2,n[0]+2)
 
     fig, ax = plt.subplots(nrows = 2, ncols = 2, figsize = (16,8))
 
     ax[0][0].stem(n1, x1, markerfmt = "g", linefmt = "g--", basefmt = "g")
-    ax[0][0].set_xlim([n1[0]-1, n1[-1]+1])
+    ax[0][0].set_xlim([n1[0]-2, n1[-1]+2])
     ax[0][0].set_title("x1[n]")
     ax[0][0].set_xlabel("n")
 
