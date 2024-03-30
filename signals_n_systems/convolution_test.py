@@ -35,8 +35,9 @@ plt.plot(yf)
 
 plt.show()
 
+f = np.fft.fftfreq(ns, 1/sf)
 
-plt.stem(np.abs(np.fft.fft(x1)) / ns)
-plt.stem(np.abs(np.fft.fft(x2)) / ns)
+plt.stem(f, np.abs(np.fft.fft(x1)) / ns)
+plt.stem(f, np.abs(np.fft.fft(x2)) / ns)
 plt.show()
 
