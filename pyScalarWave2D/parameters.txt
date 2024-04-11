@@ -1,0 +1,39 @@
+# Model parameters ------------------------------
+
+n_samples_x = 681      
+n_samples_z = 141
+
+model_spacing = 25.0
+
+velocity_model_file = models/marmousi_141x681_25m.bin 
+
+# Boundary parameters ---------------------------
+
+boundary_samples = 100
+attenuation_factor = 0.0015 
+
+# Time parameters -------------------------------
+
+time_samples = 1501
+time_spacing = 2e-3
+
+# Frequency parameters --------------------------
+
+max_frequency = 20.0
+
+# OBN geometry ----------------------------------
+
+shot_beg = 1000
+shot_end = 1000
+total_shots = 1
+shot_elevation = 0
+
+node_beg = 100
+node_end = 16900
+total_nodes = 85
+node_elevation = 450
+
+# Output parameters ----------------------------
+
+total_snapshots = 101
+
