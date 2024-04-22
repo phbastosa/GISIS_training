@@ -19,56 +19,64 @@ def show_trace_header(data):
         last = data.attributes(v)[data.tracecount-1][0]
         print(f"{k: >40s} {str(v): ^6s} {str(first): ^11s} {str(last): ^11s}")
 
-def get_traces(attn, data, index, type):
-    
-    print(f"building common {type} gather")        
+def plot_seismic(data : sgy.SegyFile, sort_type : str, index : int) -> None:
 
+    '''
+    Plot a common seismic gather.
+    
+    Parameters
+    ----------        
+    
+    data: segyio object.
+
+    sort_type: ["src", "rec", "off", "cmp"]
+    
+    index: integer that select a common gather.  
+
+    Examples
+    --------
+    >>> plot_seismic(data, sort_type = "src", index = 51)
+    >>> plot_seismic(data, sort_type = "rec", index = 203)
+    >>> plot_seismic(data, sort_type = "cmp", index = 315)
+    >>> plot_seismic(data, sort_type = "off", index = 223750)
+    '''    
+
+    match sort_type:
+
+        case "src":
+            attn = 9; label = "shot"
+
+        case "rec":
+            attn = 13; label = "receiver"
+
+        case "off":
+            attn = 37; label = "offset"
+
+        case "cmp":
+            attn = 21; label = "mid point"
+
+        case _:
+            print("Invalid sort type!")
+
+    print(f"building common {label} gather")        
     if index not in data.attributes(attn)[:]:
         print("Invalid index!")
         exit()
 
-    return np.where(data.attributes(attn)[:] == index)[0]
+    traces = np.where(data.attributes(attn)[:] == index)[0]
 
-def plot_seismic(data, key, index):
-    
     seismic = data.trace.raw[:].T
+    seismic = seismic[:,traces]
 
-    match key:
-        
-        case "src":
+    scale = 0.05*np.std(seismic)
 
-            traces = get_traces(9, data, index, "shot")
-
-        case "rec":
-
-            traces = get_traces(13, data, index, "receiver")
-
-        case "offset":
-
-            traces = get_traces(37, data, index, "offset")
-
-        case "cmp":
-
-            traces = get_traces(21, data, index, "mid point")
-
-        case _:
-            print("Invalid keyword!")
-
-     
-    scale = 0.05*np.std(seismic[:,traces])
-
-    plt.imshow(seismic[:,traces], aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
+    plt.imshow(seismic, aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
     plt.tight_layout()
     plt.show()
-
 
 # -------------------------------------------------------------------------------
 
 data = sgy.open("2D_Land_vibro_data_2ms/seismic_raw.sgy", ignore_geometry = True)
 
-# offset = data.attributes(37)[:282]
-
-# print(offset)
-
-plot_seismic(data, key = "offset", index = 203750)
+plot_seismic(data, sort_type = "src", index = 51)
 
