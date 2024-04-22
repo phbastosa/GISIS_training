@@ -45,7 +45,7 @@ rx = np.zeros(spread*total_sources, dtype = float)
 ry = np.zeros(spread*total_sources, dtype = float)
 rz = np.zeros(spread*total_sources, dtype = float)
 
-tsl = np.arange(spread*total_sources, dtype = int)
+tsl = np.arange(spread*total_sources, dtype = int) + 1
 
 seismic = np.zeros((time_samples, spread*total_sources), dtype = np.float32)
 
