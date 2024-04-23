@@ -11,7 +11,7 @@ def butter_bandpass_filter(input_trace, lowcut, highcut, fs, order = 5):
 
 data_path = "2D_Land_vibro_data_2ms/seismic_raw.sgy"
 
-shot_gather = 51
+shot_gather = 1
 
 lowcut = 20
 highcut = 40
@@ -55,12 +55,12 @@ seismic_output_fft = seismic_output_fft[:,traces]
 
 frequency = np.fft.fftfreq(nt, dt)
 
-mask = np.logical_and(frequency > 0, frequency < 100)
+mask = np.logical_and(frequency >= 0, frequency <= 101)
 
 floc = np.linspace(0, len(frequency[mask])-1, 11, dtype = int)
-flab = np.array(frequency[floc], dtype = int)+1
+flab = np.array(frequency[floc], dtype = int)
 
-tloc = np.linspace(0, nt, 11, dtype = int)
+tloc = np.linspace(0, nt-1, 11, dtype = int)
 tlab = np.around(tloc*dt, decimals = 1)
 
 xloc = np.linspace(0, nx, 5)
@@ -76,7 +76,6 @@ ax[0,0].set_yticks(tloc)
 ax[0,0].set_yticklabels(tlab)
 ax[0,0].set_xticks(xloc)
 ax[0,0].set_xticklabels(xlab)
-
 ax[0,0].set_title(f"Input shot gather number = {shot_gather}")
 ax[0,0].set_xlabel("Offset [m]")
 ax[0,0].set_ylabel("Two way time [s]")
@@ -111,16 +110,3 @@ ax[1,1].set_ylabel("Frequency [Hz]")
 fig.tight_layout()
 plt.show()
 
-
-
-# plt.figure(1, figsize = (5, 8))
-# plt.imshow(seismic_input, aspect = "auto", cmap = "Greys", vmin = -scale_input, vmax = scale_input)
-# plt.tight_layout()
-
-
-
-# plt.figure(2, figsize = (5,8))
-# plt.imshow(np.abs(seismic_fft[mask, :]), aspect = "auto", cmap = "jet")
-
-# plt.tight_layout()
-# plt.show()
