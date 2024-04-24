@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from scipy.signal import butter, lfilter
 
-def butter_bandpass_filter(input_trace, lowcut, highcut, fs, order = 5):
+def butter_bandpass_filter(input_trace, lowcut, highcut, fs, order = 6):
     b, a = butter(order, [lowcut, highcut], fs = fs, btype = 'band')
     return lfilter(b, a, input_trace)
 
@@ -32,6 +32,8 @@ seismic_input = data_input.trace.raw[:].T
 seismic_output = np.zeros_like(seismic_input)
 
 for i in range(len(seismic_input[0])):
+    
+    seismic_output[:,i] *= 1.0 / (np.max(seismic_output[:,i]) + 1e-3) 
     seismic_output[:,i] = butter_bandpass_filter(seismic_input[:,i], lowcut, highcut, 1.0/dt)
 
 seismic_input_fft = np.fft.fft(seismic_input, axis = 0)
