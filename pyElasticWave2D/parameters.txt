@@ -1,0 +1,39 @@
+# Model parameters ------------------------------
+
+n_samples_x = 3401           # <int> [unit]
+n_samples_z = 701            # <int> [unit]
+
+model_spacing = 5.0          # <float> [m]
+
+vp_file = models/marmousi_vp_701x3401_5m.bin 
+vs_file = models/marmousi_vs_701x3401_5m.bin 
+rho_file = models/marmousi_rho_701x3401_5m.bin 
+
+# Boundary parameters ---------------------------
+
+boundary_samples = 100       # <int> [unit]
+attenuation_factor = 0.0015  # <float>
+
+# Time parameters -------------------------------
+
+time_samples = 5001          # <int> [unit]
+time_spacing = 1e-3          # <float> [s]
+
+# Frequency parameters --------------------------
+
+max_frequency = 20.0         # <float> [Hz] 
+
+# OBN geometry ----------------------------------
+
+x_shot = 1000                # <float> [m]   
+shot_elevation = 5           # <float> [m]
+
+x_node_beg = 100             # <float> [m]
+x_node_end = 16900           # <float> [m]
+node_elevation = 450         # <float> [m]
+total_nodes = 85             # <int> [unit]
+
+# Output parameters ----------------------------
+
+total_snapshots = 101        # <int> [unit]
+
