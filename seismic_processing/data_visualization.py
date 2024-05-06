@@ -44,39 +44,60 @@ def plot_seismic(data : sgy.SegyFile, sort_type : str, index : int) -> None:
     match sort_type:
 
         case "src":
-            attn = 9; label = "shot"
+            byte = 9; label = "shot"
 
         case "rec":
-            attn = 13; label = "receiver"
+            byte = 13; label = "receiver"
 
         case "off":
-            attn = 37; label = "offset"
+            byte = 37; label = "offset"
 
         case "cmp":
-            attn = 21; label = "mid point"
+            byte = 21; label = "mid point"
 
         case _:
             print("Invalid sort type!")
 
     print(f"building common {label} gather")        
-    if index not in data.attributes(attn)[:]:
+    if index not in data.attributes(byte)[:]:
         print("Invalid index!")
         exit()
 
-    traces = np.where(data.attributes(attn)[:] == index)[0]
+    traces = np.where(data.attributes(byte)[:] == index)[0]
 
     seismic = data.trace.raw[:].T
     seismic = seismic[:,traces]
 
     scale = 0.05*np.std(seismic)
 
+    sx = data.attributes(73)[traces]
+    sy = data.attributes(77)[traces]
+
+    gx = data.attributes(81)[traces]
+    gy = data.attributes(85)[traces]
+
+    cmpx = data.attributes(181)[traces]
+    cmpy = data.attributes(185)[traces]
+
+
+    plt.figure(1)
     plt.imshow(seismic, aspect = "auto", cmap = "Greys", vmin = -scale, vmax = scale)
     plt.tight_layout()
+
+    plt.figure(2)
+    plt.plot(sx/100, sy/100, "o")
+    plt.plot(gx/100, gy/100, "o")
+    # plt.plot(cmpx/100, cmpy/100, "o")
     plt.show()
 
 # -------------------------------------------------------------------------------
 
 data = sgy.open("2D_Land_vibro_data_2ms/seismic_raw.sgy", ignore_geometry = True)
 
-plot_seismic(data, sort_type = "src", index = 51)
+# show_trace_header(data)
+
+# plot_seismic(data, sort_type = "src", index = 51)
+plot_seismic(data, sort_type = "rec", index = 203)
+# plot_seismic(data, sort_type = "cmp", index = 315)
+# plot_seismic(data, sort_type = "off", index = 223750)
 

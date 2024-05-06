@@ -3,7 +3,7 @@ import segyio as sgy
 
 '''
     Fixing original data: raw traces removed.
-    Adding header properly: keywords updated.
+    Adding properly headers: keywords updated.
 '''
 
 time_samples = 1501
