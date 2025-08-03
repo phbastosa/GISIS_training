@@ -6,16 +6,14 @@ from os import system
 from numba import njit, prange
 
 from matplotlib import rc
-from IPython.display import HTML
 
-rc('animation', html='html5')
+rc('animation', html = 'html5')
 
 class Modeling:
 
     def __init__(self, parameters):
 
-        self.snapCount = 0    
-        self.fdm_stencil = 4    
+        self.snapCount = 0      
         self.file = parameters    
     
     def catch_parameter(self, target):
@@ -49,7 +47,7 @@ class Modeling:
         self.total_nodes = int(self.catch_parameter("total_nodes"))
 
         self.nxx = self.nx + 2*self.nb
-        self.nzz = self.nz + self.nb+4
+        self.nzz = self.nz + 2*self.nb
 
         self.wavelet = np.zeros(self.nt)
         
@@ -101,12 +99,11 @@ class Modeling:
 
     def set_boundary(self):
 
-        self.Vp[self.fdm_stencil:self.nzz-self.nb, self.nb:self.nxx-self.nb] = self.vp[:,:]
-
-        self.Vp[:self.fdm_stencil, self.nb:self.nxx-self.nb] = self.vp[0,:]
+        self.Vp[self.nb:self.nzz-self.nb, self.nb:self.nxx-self.nb] = self.vp[:,:]
 
         for i in range(self.nb):
-            self.Vp[self.nzz-i-1, self.nb:self.nxx-self.nb] = self.vp[-1,:]
+            self.Vp[i, self.nb:self.nxx-self.nb] = self.vp[0,:]
+            self.Vp[self.nzz-i-1,self.nb:self.nxx-self.nb] = self.vp[-1,:]
 
         for j in range(self.nb):
             self.Vp[:,j] = self.Vp[:,self.nb]
@@ -122,24 +119,31 @@ class Modeling:
         for i in range(self.nb):   
             damp1D[i] = np.exp(-(self.factor*(self.nb - i))**2.0)
 
-        for i in range(0, self.nzz-self.nb):
+        for i in range(self.nb, self.nzz-self.nb):
             self.damp2D[i, :self.nb] = damp1D
             self.damp2D[i, self.nxx-self.nb:self.nxx] = damp1D[::-1]
 
         for j in range(self.nb, self.nxx-self.nb):
+            self.damp2D[:self.nb, j] = damp1D    
             self.damp2D[self.nzz-self.nb:self.nzz, j] = damp1D[::-1]    
 
         for i in range(self.nb):
-            self.damp2D[self.nzz-self.nb-1:self.nzz-i-1, i] = damp1D[i]
-            self.damp2D[self.nzz-i-1, i:self.nb] = damp1D[i]
+            self.damp2D[i:self.nb, i] = damp1D[i]
+            self.damp2D[i, i:self.nb] = damp1D[i]
+            
+            self.damp2D[i:self.nb, self.nxx-i-1] = damp1D[i]
+            self.damp2D[i, self.nxx-self.nb-1:self.nxx-i] = damp1D[i]
 
-            self.damp2D[self.nzz-self.nb-1:self.nzz-i, self.nxx-i-1] = damp1D[i]
+            self.damp2D[self.nzz-i-1, i:self.nb] = damp1D[i]
+            self.damp2D[self.nzz-self.nb-1:self.nzz-i-1, i] = damp1D[i]
+
+            self.damp2D[self.nzz-self.nb-1:self.nzz-i-1, self.nxx-i-1] = damp1D[i]
             self.damp2D[self.nzz-i-1, self.nxx-self.nb-1:self.nxx-i] = damp1D[i]
 
     def fdm_propagation(self):
 
         sIdx = int(self.sx[0] / self.dh) + self.nb
-        sIdz = int(self.sz[0] / self.dh + self.fdm_stencil)    
+        sIdz = int(self.sz[0] / self.dh) + self.nb    
 
         for self.time_step in range(self.nt):
 
@@ -164,7 +168,7 @@ class Modeling:
 
         if self.time_step % int(self.nt / 100) == 0:
             system("clear")
-            print(f"\nModel lenght = ({(self.nz-1)*self.dh:.0f}, {(self.nx-1)*self.dh:.0f}) m")
+            print(f"\nModel length = ({(self.nz-1)*self.dh:.0f}, {(self.nx-1)*self.dh:.0f}) m")
             print(f"Spacial spacing = {self.dh} m")
             print(f"Max velocity = {self.vmax} m/s")
             print(f"Min velocity = {self.vmin} m/s")
@@ -184,13 +188,13 @@ class Modeling:
     def get_snapshots(self):        
         if self.snapCount < self.nsnaps:
             if self.time_step % int(self.nt / self.nsnaps) == 0:
-                self.snapshots[:, :, self.snapCount] = self.Upre[self.fdm_stencil:self.nz+self.fdm_stencil, self.nb:self.nxx-self.nb]
+                self.snapshots[:, :, self.snapCount] = self.Upre[self.nb:self.nzz-self.nb, self.nb:self.nxx-self.nb]
                 self.snapCount += 1
 
     def get_seismogram(self):
         for k in range(self.total_nodes):
             rIdx = int(self.rx[k] / self.dh) + self.nb
-            rIdz = int(self.rz[k] / self.dh) + 4
+            rIdz = int(self.rz[k] / self.dh) + self.nb
             self.seismogram[self.time_step, k] = self.Upre[rIdz, rIdx]
     
     def plot_wavelet(self):
@@ -214,15 +218,15 @@ class Modeling:
         ax[1].set_xlabel("Frequency [Hz]", fontsize = 15)    
         ax[1].set_ylabel("Normalized amplitude", fontsize = 18)    
 
-        plt.tight_layout()
+        fig.tight_layout()
         plt.show()
 
     def plot_geometry(self):
 
-        xloc = np.linspace(self.nb, self.nx + self.nb - 1, 11, dtype = int) 
+        xloc = np.linspace(self.nb, self.nxx - 1, 11, dtype = int) 
         xlab = np.array((xloc - self.nb)*self.dh, dtype = int) 
 
-        zloc = np.linspace(0, self.nz - 1, 7, dtype = int) 
+        zloc = np.linspace(self.nb, self.nzz - 1, 7, dtype = int) 
         zlab = np.array(zloc*self.dh, dtype = int) 
 
         fig, ax = plt.subplots(1,1, figsize = (12,5))
@@ -230,14 +234,15 @@ class Modeling:
         img = ax.imshow(self.Vp, aspect = "auto", cmap = "jet")
         cbar = fig.colorbar(img, ax = ax, extend = 'neither')
         cbar.minorticks_on()
+        cbar.set_label("P wave Velocity [m/s]", fontsize = 15)
 
-        ax.plot(np.arange(self.nx)+self.nb, np.ones(self.nx)+4-1, "-k")
-        ax.plot(np.arange(self.nx)+self.nb, np.ones(self.nx)+4+self.nz-1, "-k")
-        ax.plot(np.ones(self.nz)+self.nb-1, np.arange(self.nz)+4, "-k")
-        ax.plot(np.ones(self.nz)+self.nb+self.nx-1, np.arange(self.nz)+4, "-k")
+        ax.plot(np.arange(self.nx)+self.nb, np.ones(self.nx)+self.nb, "-k")
+        ax.plot(np.arange(self.nx)+self.nb, np.ones(self.nx)+self.nz+self.nb, "-k")
+        ax.plot(np.ones(self.nz)+self.nb, np.arange(self.nz)+self.nb, "-k")
+        ax.plot(np.ones(self.nz)+self.nx+self.nb, np.arange(self.nz)+self.nb, "-k")
 
-        ax.scatter(self.sx / self.dh + self.nb, self.sz / self.dh + self.fdm_stencil, color = "red")
-        ax.scatter(self.rx / self.dh + self.nb, self.rz / self.dh + self.fdm_stencil, color = "cyan")
+        ax.scatter(self.sx / self.dh + self.nb, self.sz / self.dh + self.nb, color = "red")
+        ax.scatter(self.rx / self.dh + self.nb, self.rz / self.dh + self.nb, color = "cyan")
         
         ax.set_xticks(xloc)
         ax.set_xticklabels(xlab)
@@ -254,13 +259,13 @@ class Modeling:
 
     def plot_seismogram(self):
 
-        tloc = np.linspace(0, self.nt, 11, dtype = int)
+        tloc = np.linspace(0, self.nt-1, 11, dtype = int)
         tlab = np.around(tloc * self.dt, decimals = 1)
 
         xloc = np.linspace(0, self.total_nodes-1, 9)
         xlab = np.array((self.rx[1] - self.rx[0])*xloc + self.rx[0], dtype = int)
 
-        scale = 0.9 * np.std(self.seismogram)    
+        scale = 2.0 * np.std(self.seismogram)    
 
         fig, ax = plt.subplots(figsize = (10,8))
 
@@ -283,7 +288,7 @@ class Modeling:
 
     def plot_snapshots(self):
 
-        self.scale = 0.5 * np.std(self.snapshots)
+        self.scale = 2.0 * np.std(self.snapshots)
 
         xloc = np.linspace(0, self.nx-1, 11, dtype = int) 
         xlab = np.array(xloc*self.dh, dtype = int) 

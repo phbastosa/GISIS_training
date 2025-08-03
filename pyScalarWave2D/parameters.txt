@@ -14,12 +14,12 @@ attenuation_factor = 0.0015
 
 # Time parameters -------------------------------
 
-time_samples = 1501
+time_samples = 5001
 time_spacing = 2e-3
 
 # Frequency parameters --------------------------
 
-max_frequency = 20.0
+max_frequency = 15.0
 
 # OBN geometry ----------------------------------
 
