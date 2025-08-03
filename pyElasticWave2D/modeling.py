@@ -5,6 +5,10 @@ import matplotlib.animation as animation
 from os import system
 from numba import njit, prange
 
+from matplotlib import rc
+
+rc('animation', html = 'html5')
+
 class Modeling:
 
     def __init__(self, parameters):
@@ -36,76 +40,82 @@ class Modeling:
         self.factor = float(self.catch_parameter("attenuation_factor")) 
 
         self.nsnaps = int(self.catch_parameter("total_snapshots"))
+        
+        self.vp_file = self.catch_parameter("vp_file")
+        self.vs_file = self.catch_parameter("vs_file")
+        self.ro_file = self.catch_parameter("ro_file")
 
+        self.total_shots = int(self.catch_parameter("total_shots"))
         self.total_nodes = int(self.catch_parameter("total_nodes"))
 
         self.nxx = self.nx + 2*self.nb
         self.nzz = self.nz + 2*self.nb
 
-        self.snapshots = np.zeros((self.nz, self.nx, self.nsnaps))
-        self.seismogram = np.zeros((self.nt, self.total_nodes))
-
-    def set_models(self):
-
-        self.vp_file = self.catch_parameter("vp_file")
-        self.vp = np.fromfile(self.vp_file, dtype = np.float32, count = self.nx * self.nz)            
-        self.vp = np.reshape(self.vp, [self.nz, self.nx], order = "F")
-
-        self.vs_file = self.catch_parameter("vs_file")
-        self.vs = np.fromfile(self.vp_file, dtype = np.float32, count = self.nx * self.nz)            
-        self.vs = np.reshape(self.vp, [self.nz, self.nx], order = "F")
-
-        self.rho_file = self.catch_parameter("rho_file")
-        self.rho = np.fromfile(self.vp_file, dtype = np.float32, count = self.nx * self.nz)            
-        self.rho = np.reshape(self.vp, [self.nz, self.nx], order = "F")
-
-    def set_geometry(self):
-
-        self.sx = float(self.catch_parameter("x_shot"))
-        self.sz = float(self.catch_parameter("shot_elevation")) 
-
-        inode = float(self.catch_parameter("x_node_beg"))
-        fnode = float(self.catch_parameter("x_node_end"))
-        gelev = float(self.catch_parameter("node_elevation"))
-
-        self.rx = np.linspace(inode, fnode, self.total_nodes)
-        self.rz = np.zeros(self.total_nodes) + gelev 
-
-    def set_boundary(self):
-
-        self.B = np.zeros((self.nzz, self.nxx))    
+        self.wavelet = np.zeros(self.nt)
+        
+        self.vp = np.zeros((self.nz, self.nx))
+        self.vs = np.zeros((self.nz, self.nx))
+        self.ro = np.zeros((self.nz, self.nx))
+        
+        self.B = np.zeros((self.nzz, self.nxx))
         self.M = np.zeros((self.nzz, self.nxx))
         self.L = np.zeros((self.nzz, self.nxx))
 
-        self.Vp = np.zeros((self.nzz, self.nxx))
+        self.P = np.zeros_like(self.B)
+        self.Vx = np.zeros_like(self.B)
+        self.Vz = np.zeros_like(self.B)
+        self.Txx = np.zeros_like(self.B)
+        self.Tzz = np.zeros_like(self.B)
+        self.Txz = np.zeros_like(self.B)
 
-        x_slice = slice(self.nb, self.nxx - self.nb)
-        z_slice = slice(self.nb, self.nzz - self.nb)
+        self.damp2D = np.ones_like(self.B)
 
-        self.Vp[z_slice, x_slice] = self.vp
+        self.snapshots = np.zeros((self.nz, self.nx, self.nsnaps))
+        self.seismogram = np.zeros((self.nt, self.total_nodes))
 
-        self.B[z_slice, x_slice] = 1.0 / self.rho
-        self.M[z_slice, x_slice] = self.rho*self.vs**2
-        self.L[z_slice, x_slice] = self.rho*(self.vp**2 - self.vs**2)
+    def import_models(self):
+
+        self.vp = np.fromfile(self.vp_file, dtype = np.float32, count = self.nx * self.nz).reshape([self.nz, self.nx], order = "F")
+        self.vs = np.fromfile(self.vs_file, dtype = np.float32, count = self.nx * self.nz).reshape([self.nz, self.nx], order = "F")
+        self.ro = np.fromfile(self.ro_file, dtype = np.float32, count = self.nx * self.nz).reshape([self.nz, self.nx], order = "F")
+
+    def set_geometry(self):
+
+        ishot = float(self.catch_parameter("shot_beg"))
+        fshot = float(self.catch_parameter("shot_end"))
+        selev = float(self.catch_parameter("shot_elevation"))
+
+        self.sx = np.linspace(ishot, fshot, self.total_shots)
+        self.sz = np.ones(self.total_shots) * selev 
+
+        inode = float(self.catch_parameter("node_beg"))
+        fnode = float(self.catch_parameter("node_end"))
+        gelev = float(self.catch_parameter("node_elevation"))
+
+        self.rx = np.linspace(inode, fnode, self.total_nodes)
+        self.rz = np.ones(self.total_nodes) * gelev 
+
+    def set_boundary(self):
+
+        x_slice = slice(self.nb,self.nxx-self.nb)
+        z_slice = slice(self.nb,self.nzz-self.nb)
+
+        self.B[z_slice, x_slice] = 1.0 / self.ro
+        self.M[z_slice, x_slice] = self.ro*self.vs**2
+        self.L[z_slice, x_slice] = self.ro*(self.vp**2 - self.vs**2)
 
         for i in range(self.nb):
 
-            self.Vp[i, x_slice] = self.vp[0,:]
-            self.Vp[self.nzz-i-1, x_slice] = self.vp[-1,:]
+            self.B[i, x_slice] = self.B[self.nb, x_slice]
+            self.B[self.nzz-i-1, x_slice] = self.B[self.nzz-self.nb-1, x_slice]
 
-            self.B[i, x_slice] = 1.0 / self.rho[0,:]
-            self.B[self.nzz-i-1, x_slice] = 1.0 / self.rho[-1,:]
+            self.M[i, x_slice] = self.M[self.nb, x_slice]
+            self.M[self.nzz-i-1, x_slice] = self.M[self.nzz-self.nb-1, x_slice]
 
-            self.M[i, x_slice] = self.rho[0,:]*self.vs[0,:]**2
-            self.M[self.nzz-i-1, x_slice] = self.rho[-1,:]*self.vs[-1,:]**2
-
-            self.L[i, x_slice] = self.rho[0,:]*(self.vp[0,:]**2 - self.vs[0,:]**2)
-            self.L[self.nzz-i-1, x_slice] = self.rho[-1,:]*(self.vp[-1,:]**2 - self.vs[-1,:]**2)
+            self.L[i, x_slice] = self.L[self.nb, x_slice]
+            self.L[self.nzz-i-1, x_slice] = self.L[self.nzz-self.nb-1, x_slice]
 
         for j in range(self.nb):
-
-            self.Vp[:,j] = self.Vp[:,self.nb]
-            self.Vp[:,self.nxx-j-1] = self.Vp[:,-(self.nb+1)]
 
             self.B[:,j] = self.B[:,self.nb]
             self.B[:,self.nxx-j-1] = self.B[:,-(self.nb+1)]
@@ -121,30 +131,22 @@ class Modeling:
 
     def set_wavelet(self):
 
-        self.wavelet = np.zeros(self.nt)
-
         fc = self.fmax / (3.0 * np.sqrt(np.pi))    
 
         self.tlag = 2.0*np.pi/self.fmax
 
-        aux = np.zeros(self.nt)
-
-        for n in range(self.nt):
-
-            arg = np.pi*((n*self.dt - self.tlag)*fc*np.pi) ** 2.0
-            
-            aux[n] = (1.0 - 2.0*arg)*np.exp(-arg)
-
-            self.wavelet[n] = np.sum(aux[:n])
+        arg = np.pi*((np.arange(self.nt)*self.dt - self.tlag)*fc*np.pi) ** 2.0 
+        aux = (1.0 - 2.0*arg)*np.exp(-arg)
 
         w = 2.0*np.pi*np.fft.fftfreq(self.nt, self.dt)
 
-        self.wavelet = np.real(np.fft.ifft(np.fft.fft(self.wavelet)*np.sqrt(complex(0,1)*w))) 
+        aux = np.real(np.fft.ifft(np.fft.fft(aux)*np.sqrt(complex(0,1)*w))) 
+
+        for n in range(self.nt):
+            self.wavelet[n] = np.sum(aux[:n+1])
 
     def set_damper(self):
         
-        self.damp2D = np.ones((self.nzz, self.nxx))
-
         damp1D = np.zeros(self.nb)
 
         for i in range(self.nb):   
@@ -160,30 +162,35 @@ class Modeling:
 
     def fdm_propagation(self):
 
-        sIdx = int(self.sx / self.dh) + self.nb
-        sIdz = int(self.sz / self.dh + self.nb)    
+        for self.sId in range(self.total_shots):
 
-        self.Vx = np.zeros((self.nzz,self.nxx))
-        self.Vz = np.zeros((self.nzz,self.nxx))
-        self.Txx = np.zeros((self.nzz,self.nxx))
-        self.Tzz = np.zeros((self.nzz,self.nxx))
-        self.Txz = np.zeros((self.nzz,self.nxx))
+            sIdx = int(self.sx[self.sId] / self.dh) + self.nb
+            sIdz = int(self.sz[self.sId] / self.dh) + self.nb    
 
-        for self.time_step in range(self.nt):
+            self.Vx = np.zeros((self.nzz,self.nxx))
+            self.Vz = np.zeros((self.nzz,self.nxx))
+            self.Txx = np.zeros((self.nzz,self.nxx))
+            self.Tzz = np.zeros((self.nzz,self.nxx))
+            self.Txz = np.zeros((self.nzz,self.nxx))
 
-            self.show_modeling_status()
+            for self.time_step in range(self.nt):
 
-            self.Txx[sIdz,sIdx] += self.wavelet[self.time_step] / (self.dh*self.dh)
-            self.Tzz[sIdz,sIdx] += self.wavelet[self.time_step] / (self.dh*self.dh)
+                self.show_modeling_status()
 
-            fdm2D_8E2T_velocity(self.Vx, self.Vz, self.Txx, self.Tzz, self.Txz, self.B, self.nxx, self.nzz, self.dt, self.dh)
+                self.Txx[sIdz,sIdx] += self.wavelet[self.time_step] / (self.dh*self.dh)
+                self.Tzz[sIdz,sIdx] += self.wavelet[self.time_step] / (self.dh*self.dh)
 
-            fdm2D_8E2T_stress(self.Vx, self.Vz, self.Txx, self.Tzz, self.Txz, self.M, self.L, self.nxx, self.nzz, self.dt, self.dh)
+                fdm2D_8E2T_velocity(self.Vx, self.Vz, self.Txx, self.Tzz, self.Txz, self.B, self.P, self.nxx, self.nzz, self.dt, self.dh)
+                fdm2D_8E2T_pressure(self.Vx, self.Vz, self.Txx, self.Tzz, self.Txz, self.M, self.L, self.nxx, self.nzz, self.dt, self.dh)
 
-            self.P = 0.5*(self.Txx + self.Tzz)
+                self.Vx *= self.damp2D
+                self.Vz *= self.damp2D
+                self.Txx *= self.damp2D
+                self.Tzz *= self.damp2D
+                self.Txz *= self.damp2D
 
-            self.get_snapshots()
-            self.get_seismogram()
+                self.get_snapshots()
+                self.get_seismogram()
 
     def show_modeling_status(self):
 
@@ -198,6 +205,8 @@ class Modeling:
             print(f"Total time = {(self.nt-1)*self.dt} s")
             print(f"Max frequency = {self.fmax} Hz")
 
+            print(f"\nRunning shot {self.sId+1} of {self.total_shots}")
+
             print(f"\nModeling progress = {100*(self.time_step+1)/self.nt:.0f} %")        
 
     def get_snapshots(self):        
@@ -209,20 +218,20 @@ class Modeling:
     def get_seismogram(self):
         for k in range(self.total_nodes):
             rIdx = int(self.rx[k] / self.dh) + self.nb
-            rIdz = int(self.rz[k] / self.dh) + 4
+            rIdz = int(self.rz[k] / self.dh) + self.nb
             self.seismogram[self.time_step, k] = self.P[rIdz, rIdx]
     
     def plot_wavelet(self):
-        nw = int(4*self.tlag/self.dt)
-        t = np.arange(nw) * self.dt
+
+        t = np.arange(self.nt) * self.dt
         f = np.fft.fftfreq(self.nt, self.dt)
 
         fwavelet = np.fft.fft(self.wavelet)
 
         fig, ax = plt.subplots(nrows = 2, ncols = 1, figsize = (10,8))
 
-        ax[0].plot(t, self.wavelet[:nw] * 1.0 / np.max(self.wavelet))
-        ax[0].set_xlim([0, nw*self.dt])
+        ax[0].plot(t, self.wavelet * 1.0 / np.max(self.wavelet))
+        ax[0].set_xlim([0, (self.nt-1)*self.dt])
         ax[0].set_title("Wavelet filtered by half derivative technique", fontsize = 18)    
         ax[0].set_xlabel("Time [s]", fontsize = 15)    
         ax[0].set_ylabel("Normalized amplitude", fontsize = 18)    
@@ -233,53 +242,18 @@ class Modeling:
         ax[1].set_xlabel("Frequency [Hz]", fontsize = 15)    
         ax[1].set_ylabel("Normalized amplitude", fontsize = 18)    
 
-        plt.tight_layout()
-        plt.show()
-
-    def plot_geometry(self):
-
-        xloc = np.linspace(self.nb, self.nx + self.nb - 1, 11, dtype = int) 
-        xlab = np.array((xloc - self.nb)*self.dh, dtype = int) 
-
-        zloc = np.linspace(self.nb, self.nz + self.nb - 1, 7, dtype = int) 
-        zlab = np.array((zloc - self.nb)*self.dh, dtype = int) 
-
-        fig, ax = plt.subplots(1,1, figsize = (20,5))
-
-        img = ax.imshow(self.Vp, aspect = "auto", cmap = "jet")
-        cbar = fig.colorbar(img, ax = ax, extend = 'neither')
-        cbar.set_label("P wave velocity [m/s]", fontsize = 15)
-
-        ax.plot(np.arange(self.nx)+self.nb, np.ones(self.nx)+self.nb-1, "-k")
-        ax.plot(np.arange(self.nx)+self.nb, np.ones(self.nx)+self.nb+self.nz-1, "-k")
-        ax.plot(np.ones(self.nz)+self.nb-1, np.arange(self.nz)+self.nb, "-k")
-        ax.plot(np.ones(self.nz)+self.nb+self.nx-1, np.arange(self.nz)+self.nb, "-k")
-
-        ax.scatter(self.sx / self.dh + self.nb, self.sz / self.dh + self.nb, color = "red")
-        ax.scatter(self.rx / self.dh + self.nb, self.rz / self.dh + self.nb, color = "cyan")
-        
-        ax.set_xticks(xloc)
-        ax.set_xticklabels(xlab)
-
-        ax.set_yticks(zloc)
-        ax.set_yticklabels(zlab)
-
-        ax.set_title("Model delimitations and geometry", fontsize = 18)
-        ax.set_xlabel("Distance [m]", fontsize = 15)
-        ax.set_ylabel("Depth [m]", fontsize = 15)
-
-        plt.tight_layout()
+        fig.tight_layout()
         plt.show()
 
     def plot_seismogram(self):
 
-        tloc = np.linspace(0, self.nt, 11, dtype = int)
+        tloc = np.linspace(0, self.nt-1, 11, dtype = int)
         tlab = np.around(tloc * self.dt, decimals = 1)
 
         xloc = np.linspace(0, self.total_nodes-1, 9)
         xlab = np.array((self.rx[1] - self.rx[0])*xloc + self.rx[0], dtype = int)
 
-        scale = 0.9 * np.std(self.seismogram)    
+        scale = 2.0 * np.std(self.seismogram)    
 
         fig, ax = plt.subplots(figsize = (10,8))
 
@@ -302,7 +276,7 @@ class Modeling:
 
     def plot_snapshots(self):
 
-        self.scale = 0.5 * np.std(self.snapshots)
+        self.scale = 2.0 * np.std(self.snapshots)
 
         xloc = np.linspace(0, self.nx-1, 11, dtype = int) 
         xlab = np.array(xloc*self.dh, dtype = int) 
@@ -323,7 +297,7 @@ class Modeling:
             im = [self.snap, self.vmod, self.shots, self.nodes]
             ims.append(im)
 
-        self.ani = animation.ArtistAnimation(fig, ims, interval = 100, blit=True, repeat_delay = 0)
+        self.ani = animation.ArtistAnimation(fig, ims, interval = (self.nt/self.nsnaps)*self.dt*1e3, blit = True, repeat_delay = 0)
  
         self.ax.set_xticks(xloc)
         self.ax.set_xticklabels(xlab)
@@ -337,7 +311,7 @@ class Modeling:
         
 
 @njit(parallel = True)
-def fdm2D_8E2T_velocity(Vx, Vz, Txx, Tzz, Txz, B, nxx, nzz, dt, dh):
+def fdm2D_8E2T_velocity(Vx, Vz, Txx, Tzz, Txz, B, P, nxx, nzz, dt, dh):
 
     for index in prange(nxx*nzz):
         
@@ -376,8 +350,10 @@ def fdm2D_8E2T_velocity(Vx, Vz, Txx, Tzz, Txz, B, nxx, nzz, dt, dh):
 
             Vz[i,j] += dt*Bz*(d_Txz_dx + d_Tzz_dz)
 
+        P[i,j] = 0.5*(Txx[i,j] + Tzz[i,j])
+
 @njit(parallel = True)
-def fdm2D_8E2T_stress(Vx, Vz, Txx, Tzz, Txz, M, L, nxx, nzz, dt, dh):
+def fdm2D_8E2T_pressure(Vx, Vz, Txx, Tzz, Txz, M, L, nxx, nzz, dt, dh):
 
     for index in prange(nxx*nzz):
         

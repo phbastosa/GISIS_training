@@ -1,13 +1,13 @@
 # Model parameters ------------------------------
 
-n_samples_x = 3401           # <int> [unit]
-n_samples_z = 701            # <int> [unit]
+n_samples_x = 1701           # <int> [unit]
+n_samples_z = 351            # <int> [unit]
 
-model_spacing = 5.0          # <float> [m]
+model_spacing = 10.0         # <float> [m]
 
-vp_file = models/marmousi_vp_701x3401_5m.bin 
-vs_file = models/marmousi_vs_701x3401_5m.bin 
-rho_file = models/marmousi_rho_701x3401_5m.bin 
+vp_file = ../marmousi2/vp_351x1701_10m.bin 
+vs_file = ../marmousi2/vs_351x1701_10m.bin 
+ro_file = ../marmousi2/ro_351x1701_10m.bin 
 
 # Boundary parameters ---------------------------
 
@@ -21,17 +21,19 @@ time_spacing = 1e-3          # <float> [s]
 
 # Frequency parameters --------------------------
 
-max_frequency = 20.0         # <float> [Hz] 
+max_frequency = 15.0         # <float> [Hz] 
 
 # OBN geometry ----------------------------------
 
-x_shot = 1000                # <float> [m]   
-shot_elevation = 5           # <float> [m]
+shot_beg = 1000
+shot_end = 1000
+total_shots = 1
+shot_elevation = 0
 
-x_node_beg = 100             # <float> [m]
-x_node_end = 16900           # <float> [m]
-node_elevation = 450         # <float> [m]
-total_nodes = 85             # <int> [unit]
+node_beg = 100
+node_end = 16900
+total_nodes = 85
+node_elevation = 450
 
 # Output parameters ----------------------------
 

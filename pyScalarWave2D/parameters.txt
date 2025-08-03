@@ -1,11 +1,11 @@
 # Model parameters ------------------------------
 
-n_samples_x = 681      
-n_samples_z = 141
+n_samples_x = 1701      
+n_samples_z = 351
 
-model_spacing = 25.0
+model_spacing = 10.0
 
-velocity_model_file = models/marmousi_141x681_25m.bin 
+vp_file = ../marmousi2/vp_351x1701_10m.bin 
 
 # Boundary parameters ---------------------------
 
@@ -15,7 +15,7 @@ attenuation_factor = 0.0015
 # Time parameters -------------------------------
 
 time_samples = 5001
-time_spacing = 2e-3
+time_spacing = 1e-3
 
 # Frequency parameters --------------------------
 
